@@ -21,7 +21,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import func
-
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
@@ -73,3 +73,24 @@ def report(limit=0, offset=0):
         json_result_list.append(json_result)
 
     return json_result_list
+
+def nationality_review():
+    
+    # Obtener los últimos 250 registros del paciente
+    # ordenado por fecha, obteniedo los últimos 250 registros
+    query = db.session.query(Persona)
+    query = query.limit(250)
+    query_results = query.all()
+
+    if query_results is None or len(query_results) == 0:
+        # No data register
+        # Bug a proposito dejado para poner a prueba el traceback
+        # ya que el sistema espera una tupla
+        return []
+
+    # De los resultados obtenidos tomamos el tiempo y las puslaciones pero
+    # en el orden inverso, para tener del más viejo a la más nuevo registro
+    id_persona = [x.id for x in query_results]
+    age_persona = [x.age for x in query_results]
+
+    return id_persona, age_persona
